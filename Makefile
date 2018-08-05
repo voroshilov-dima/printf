@@ -36,7 +36,7 @@ FT_PRINTF_HEADER = ft_printf.h
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
-	ar -cvq $(NAME) $(OBJ)
+	ar -cvq $(NAME) $(OBJ) $(LIBFT_DIR)*.o
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c $(INC)$(FT_PRINTF_HEADER)
 	$(CC) $(CCFLAGS) -I $(INC) -I $(LIBFT_DIR) -c $< -o $@ 

@@ -4,8 +4,8 @@ int	ft_printf(const char *restrict format, ...);
 
 int main(void)
 {
-	printf("%%");
+	printf("%  +d", 42);
 	printf("\n");
-	ft_printf("%%");
+	ft_printf("%  +d", 42);
 	printf("\n");
 }

@@ -11,9 +11,12 @@
 /* ************************************************************************** */
 
 #include <stdio.h>
-#include <libft.h>
+#include "libft.h"
 #include <stdarg.h>
 #include <stdlib.h>
+
+#define MINUS 0x00000001
+
 
 int	ft_printf(const char *restrict format, ...)
 {
