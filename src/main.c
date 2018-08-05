@@ -18,48 +18,73 @@
 #define MINUS 0x00000001
 
 
+int parse_int(const char *restrict s, int start, int end)
+{
+	int counter;
+
+	counter = 0;
+	while (start <= end)
+	{
+		ft_putchar(s[start++]);
+		counter++;
+	}
+	return (counter);
+}
+
+int (*define_parse_function(char c))(const char *restrict s, int, int)
+{
+	if (c == 's' ||
+		c == 'S' ||
+		c == 'p' ||
+		c == 'd' ||
+		c == 'D' ||
+		c == 'i' ||
+		c == 'o' ||
+		c == 'O' ||
+		c == 'u' ||
+		c == 'U' ||
+		c == 'x' ||
+		c == 'X' ||
+		c == 'c' ||
+		c == 'C')
+		return (parse_int);
+	return (0);
+}
+
+
 int	ft_printf(const char *restrict format, ...)
 {
 	va_list args;
-	va_start(args, format);
 	int counter;
+	int start;
+	int end;
+	int (*parser)(const char *restrict, int, int);
+
+	va_start(args, format);
 	counter = 0;
-	while (*format != '\0')
+	start = 0;
+	end = 0;
+	while (format[start] != '\0')
 	{
-		if ('%' == *format)
+		if (format[start] == '%')
 		{
-			format++;	
-			if (*format == 'c')
-			{
-				char c = va_arg(args, int); // is't ok?
-				counter += printf("%c", c);
-			}
-			else if (*format == 's')
-			{
-				char *s = va_arg(args, char *); // is't ok?
-				counter += printf("%s", s);
-			}
-			else if (*format == 'd' || *format == 'i')
-			{
-				int i = va_arg(args, int);
-				counter += printf("%d", i);
-			}
-			else if (*format == '%')
-			{
-				counter += 1;
-				ft_putchar('%');
-			}
-			else
-			{
-				printf("Unknown modifier. List of supported modifiers: sSpdDioOuUxXcC\n");
-				exit(1);
-			}
+			start++;
+			end++;
+			while (!(parser = define_parse_function(format[end])))
+				end++;
+			parser(format, start, end);
+
+			//	
+			//	передавать-то нужно не флаг, а переменную ебана
+			//
+
 		}
 		else
 		{
-			counter += printf("%c", *format);
+			ft_putchar(format[start]);
+			counter++;
 		}
-		format++;
+		start++;
 	}
 	//printf("(%d)", counter);
 	return (counter);
