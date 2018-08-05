@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <stdio.h>
+#include <libft.h>
 #include <stdarg.h>
 #include <stdlib.h>
 
@@ -18,6 +19,8 @@ int	ft_printf(const char *restrict format, ...)
 {
 	va_list args;
 	va_start(args, format);
+	int counter;
+	counter = 0;
 	while (*format != '\0')
 	{
 		if ('%' == *format)
@@ -26,22 +29,35 @@ int	ft_printf(const char *restrict format, ...)
 			if (*format == 'c')
 			{
 				char c = va_arg(args, int); // is't ok?
-				printf("%c\n", c);
+				counter += printf("%c", c);
+			}
+			else if (*format == 's')
+			{
+				char *s = va_arg(args, char *); // is't ok?
+				counter += printf("%s", s);
 			}
 			else if (*format == 'd' || *format == 'i')
 			{
 				int i = va_arg(args, int);
-				printf("%d\n", i);
+				counter += printf("%d", i);
+			}
+			else if (*format == '%')
+			{
+				counter += 1;
+				ft_putchar('%');
 			}
 			else
 			{
-				printf("%c", *format);
 				printf("Unknown modifier. List of supported modifiers: sSpdDioOuUxXcC\n");
 				exit(1);
 			}
 		}
-		printf("%c", *format);
+		else
+		{
+			counter += printf("%c", *format);
+		}
 		format++;
 	}
-	return (0);
+	//printf("(%d)", counter);
+	return (counter);
 }
