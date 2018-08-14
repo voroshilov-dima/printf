@@ -76,7 +76,7 @@ int print_one(char type, t_flags flags, va_list args)
 	flags.null = 0; // trash
 	
 
-	if (type == 'd' || type == 'c' || type == 'x' || type == 'X')
+	if (type == 'd' || type == 'c' || type == 'x' || type == 'X' || type == 'o' || type == 'u')
 	{
 		int i = va_arg(args, int);
 		if (i >= 0)
@@ -108,6 +108,10 @@ int print_one(char type, t_flags flags, va_list args)
 			counter += printf("%x", i);
 		else if (type == 'X')
 			counter += printf("%X", i);
+		else if (type == 'o')
+			counter += printf("%o", i);
+		else if (type == 'u')
+			counter += printf("%u", i);
 		fflush(stdout);
 	}
 	else if (type == 's')
