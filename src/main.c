@@ -17,21 +17,39 @@
 
 #define MINUS 0x00000001
 
+typedef struct	s_flags {
+	int space;
+	int	minus;
+	int	plus;
+	int	null;
+	int width;
+}				t_flags;
 
-int parse_int(const char *restrict s, int start, int end)
+t_flags parse_args(const char *restrict s, int start, int end)
 {
-	int counter;
+	t_flags	flags;
+	flags.space = 0;
+	flags.null = 0;
+	flags.minus = 0;
+	flags.plus = 0;
+	flags.width = 0;
 
-	counter = 0;
 	while (start <= end)
 	{
-		ft_putchar(s[start++]);
-		counter++;
+		if (s[start] == '0')
+			flags.null = 1;
+		else if (s[start] == '-')
+			flags.minus = 1;
+		else if (s[start] == '+')
+			flags.plus = 1;
+		else if (s[start] == ' ')
+			flags.space += 1;
+		start++;
 	}
-	return (counter);
+	return (flags);
 }
 
-int (*define_parse_function(char c))(const char *restrict s, int, int)
+char get_type(char c)
 {
 	if (c == 's' ||
 		c == 'S' ||
@@ -46,46 +64,112 @@ int (*define_parse_function(char c))(const char *restrict s, int, int)
 		c == 'x' ||
 		c == 'X' ||
 		c == 'c' ||
-		c == 'C')
-		return (parse_int);
+		c == 'C' ||
+		c == '%')
+		return (c);
 	return (0);
 }
 
+int print_one(char type, t_flags flags, va_list args)
+{
+	int counter = 0;
+	flags.null = 0; // trash
+	
+
+	if (type == 'd' || type == 'c' || type == 'x' || type == 'X')
+	{
+		int i = va_arg(args, int);
+		if (i >= 0)
+		{
+			if (flags.minus)
+			{
+				ft_putchar('-');
+				counter++;
+			}
+			else if (flags.plus)
+			{
+				ft_putchar('+');
+				counter++;
+			}
+			else
+			{
+				while (flags.space-- > 0)
+				{
+					ft_putchar(' ');
+					counter++;
+				}
+			}
+		}
+		if (type == 'd')
+			counter += printf("%d", i);
+		else if (type == 'c')
+			counter += printf("%c", i);
+		else if (type == 'x')
+			counter += printf("%x", i);
+		else if (type == 'X')
+			counter += printf("%X", i);
+		fflush(stdout);
+	}
+	else if (type == 's')
+	{
+		char* s = va_arg(args, char*);
+		counter += printf("%s", s);
+		fflush(stdout);
+	}
+	else if (type == '%')
+	{
+		counter += printf("%%");
+	}
+	else if (type == 'x')
+	{
+		int i = va_arg(args, int);
+		printf("%x", i);
+		counter += printf("%%");	
+	}
+	else if (type == 'x')
+	{
+		int i = va_arg(args, int);
+		printf("%X", i);
+		counter += printf("%%");	
+	}
+	if (flags.width > counter)
+	{
+		ft_putchar(' ');
+		counter++;
+	}
+	return (counter);
+}
 
 int	ft_printf(const char *restrict format, ...)
 {
-	va_list args;
-	int counter;
-	int start;
-	int end;
-	int (*parser)(const char *restrict, int, int);
+	va_list	args;
+	t_flags	flags;
+	int		counter;
+	int		i;
+	int		j;
+	char	type;
 
 	va_start(args, format);
 	counter = 0;
-	start = 0;
-	end = 0;
-	while (format[start] != '\0')
-	{
-		if (format[start] == '%')
+	i = 0;
+	while (format[i] != '\0')
+	{	
+		if (format[i] == '%')
 		{
-			start++;
-			end++;
-			while (!(parser = define_parse_function(format[end])))
-				end++;
-			parser(format, start, end);
-
-			//	
-			//	передавать-то нужно не флаг, а переменную ебана
-			//
-
+			j = 1;
+			while (!(type = get_type(format[i + j])))
+				j++;
+			flags = parse_args(format, i, i + j);
+			counter += print_one(type, flags, args);
+			i += j;
 		}
 		else
 		{
-			ft_putchar(format[start]);
+			ft_putchar(format[i]);
 			counter++;
 		}
-		start++;
+		i++;
 	}
-	//printf("(%d)", counter);
+	//printf("%d%d%d", flags.null, flags.minus, flags.plus);
 	return (counter);
 }

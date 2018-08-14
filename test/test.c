@@ -4,8 +4,8 @@ int	ft_printf(const char *restrict format, ...);
 
 int main(void)
 {
-	printf("%d", 42);
+	printf("%s is a string", "this");
 	printf("\n");
-	ft_printf("%d", 42);
+	ft_printf("%s is a string", "this");
 	printf("\n");
 }
