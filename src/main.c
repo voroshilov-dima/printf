@@ -21,6 +21,7 @@ typedef struct	s_flags {
 	int		space;
 	int		minus;
 	int		plus;
+	int		hash;
 	char	filler;
 	int		length;
 }				t_flags;
@@ -28,9 +29,10 @@ typedef struct	s_flags {
 void init_flags(t_flags *flags)
 {
 	flags->space = 0;
-	flags->filler = ' ';
 	flags->minus = 0;
 	flags->plus = 0;
+	flags->hash = 0;
+	flags->filler = ' ';
 	flags->length = 0;
 }
 
@@ -51,6 +53,8 @@ t_flags parse_args(const char *restrict s, int start, int end)
 			flags.plus = 1;
 		else if (s[start] >= 49 && s[start] <= 57)
 			flags.length = s[start] - 48;
+		else if (s[start] == '#')
+			flags.hash = 1;
 		start++;
 	}
 	return (flags);
@@ -82,6 +86,18 @@ int print_number(char type, t_flags flags, int i)
 	int counter;
 
 	counter = 0;
+	
+	if (flags.length > 0 && flags.minus == 0)
+	{
+		while (flags.length > (int)ft_strlen(ft_itoa(i)))
+		{
+			ft_putchar(flags.filler);
+			counter++;
+			flags.length--;
+		}
+		
+	}
+
 	if (i >= 0)
 	{
 		if (flags.plus)
@@ -99,36 +115,9 @@ int print_number(char type, t_flags flags, int i)
 		}
 	}
 	
+	
 	if (type == 'd')
-	{
-		if (flags.length > 0)
-		{
-			if (flags.minus == 0)
-			{
-				while (flags.length > (int)ft_strlen(ft_itoa(i)))
-				{
-					ft_putchar(flags.filler);
-					counter++;
-					flags.length--;
-				}
-				counter += printf("%d", i);
-			}
-			else 
-			{
-				counter += printf("%d", i);
-				fflush(stdout);
-				while (flags.length > (int)ft_strlen(ft_itoa(i)))
-				{
-					ft_putchar(flags.filler);
-					counter++;
-					flags.length--;
-				}
-			}
-		}
-		else
-			counter += printf("%d", i);
-		fflush(stdout);
-	}
+		counter += printf("%d", i);
 	else if (type == 'c')
 		counter += printf("%c", i);
 	else if (type == 'x')
@@ -141,6 +130,15 @@ int print_number(char type, t_flags flags, int i)
 		counter += printf("%u", i);
 	fflush(stdout);
 
+	if (flags.length > 0 && flags.minus == 1)
+	{
+		while (flags.length > (int)ft_strlen(ft_itoa(i)))
+		{
+			ft_putchar(flags.filler);
+			counter++;
+			flags.length--;
+		}
+	}			
 	return (counter);	
 }
 
