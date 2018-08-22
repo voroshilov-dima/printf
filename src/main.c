@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 typedef struct	s_flags {
+	char	*buf;
 	int		space;
 	int		minus;
 	int		plus;
@@ -79,24 +80,31 @@ char get_type(char c)
 	return (0);
 }
 
-int print_number(char type, t_flags flags, int i)
+int print_filler(t_flags *flags, int mode)
+{
+	int counter;
+
+	counter = 0;
+	if (flags->length > 0 && ((mode == -1 && flags->minus == 0) ||
+							  (mode == 1  && flags->minus == 1)))
+	{
+		while (flags->length > (int)ft_strlen(flags->buf))
+		{
+			ft_putchar(flags->filler);
+			counter++;
+			flags->length--;
+		}
+	}
+	return (counter);
+}
+
+int printing(char type, t_flags flags)
 {
 	int counter;
 
 	counter = 0;
 	
-	if (flags.length > 0 && flags.minus == 0)
-	{
-		while (flags.length > (int)ft_strlen(ft_itoa(i)))
-		{
-			ft_putchar(flags.filler);
-			counter++;
-			flags.length--;
-		}
-		
-	}
-
-	if (i >= 0)
+	if (flags.buf[0] != '-') // TO DO: not good
 	{
 		if (flags.plus)
 		{
@@ -112,31 +120,16 @@ int print_number(char type, t_flags flags, int i)
 			}
 		}
 	}
-	
-	
-	if (type == 'd')
-		counter += printf("%d", i);
-	else if (type == 'c')
-		counter += printf("%c", i);
-	else if (type == 'x')
-		counter += printf("%x", i);
-	else if (type == 'X')
-		counter += printf("%X", i);
-	else if (type == 'o')
-		counter += printf("%o", i);
-	else if (type == 'u')
-		counter += printf("%u", i);
-	fflush(stdout);
 
-	if (flags.length > 0 && flags.minus == 1)
+	counter += print_filler(&flags, -1);
+	if (type == 'd' || type == 's' || type == 'c' || type == 'x' || type == 'X' || type == 'o' || type == 'u')
 	{
-		while (flags.length > (int)ft_strlen(ft_itoa(i)))
-		{
-			ft_putchar(flags.filler);
-			counter++;
-			flags.length--;
-		}
-	}			
+		counter += printf("%s", flags.buf);
+		fflush(stdout);
+	}
+	counter += print_filler(&flags, 1);
+
+	
 	return (counter);	
 }
 
@@ -146,25 +139,26 @@ int print_one(char type, t_flags flags, va_list args)
 
 	if (type == 'd' || type == 'c' || type == 'x' || type == 'X' || type == 'o' || type == 'u')
 	{
-		int i = va_arg(args, int);
-		counter += print_number(type, flags, i);		
+		flags.buf = ft_itoa(va_arg(args, int));
+		//counter += print_number(type, flags, i);		
 	}
 	else if (type == 's')
 	{
-		char* s = va_arg(args, char*);
-		counter += printf("%s", s);
-		fflush(stdout);
+		flags.buf = va_arg(args, char *);
+		//counter += printf("%s", s);
+		//fflush(stdout);
 	}
 	else if (type == '%')
 	{
 		counter += printf("%%");
 	}
-	if (flags.length > counter)
-	{
-		ft_putchar(' ');
-		counter++;
-	}
-	return (counter);
+	// if (flags.length > counter)
+	// {
+	// 	ft_putchar(' ');
+	// 	counter++;
+	// }
+	
+	return (printing(type, flags));
 }
 
 int	ft_printf(const char *restrict format, ...)
