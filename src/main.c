@@ -18,32 +18,39 @@
 #define MINUS 0x00000001
 
 typedef struct	s_flags {
-	int space;
-	int	minus;
-	int	plus;
-	int	null;
-	int width;
+	int		space;
+	int		minus;
+	int		plus;
+	char	filler;
+	int		length;
 }				t_flags;
+
+void init_flags(t_flags *flags)
+{
+	flags->space = 0;
+	flags->filler = ' ';
+	flags->minus = 0;
+	flags->plus = 0;
+	flags->length = 0;
+}
 
 t_flags parse_args(const char *restrict s, int start, int end)
 {
 	t_flags	flags;
-	flags.space = 0;
-	flags.null = 0;
-	flags.minus = 0;
-	flags.plus = 0;
-	flags.width = 0;
+	init_flags(&flags);
 
 	while (start <= end)
 	{
-		if (s[start] == '0')
-			flags.null = 1;
+		if (s[start] == ' ')
+			flags.space += 1;
+		else if (s[start] == '0')
+			flags.filler = '0';
 		else if (s[start] == '-')
 			flags.minus = 1;
 		else if (s[start] == '+')
 			flags.plus = 1;
-		else if (s[start] == ' ')
-			flags.space += 1;
+		else if (s[start] >= 49 && s[start] <= 57)
+			flags.length = s[start] - 48;
 		start++;
 	}
 	return (flags);
@@ -70,49 +77,81 @@ char get_type(char c)
 	return (0);
 }
 
+int print_number(char type, t_flags flags, int i)
+{
+	int counter;
+
+	counter = 0;
+	if (i >= 0)
+	{
+		if (flags.plus)
+		{
+			ft_putchar('+');
+			counter++;
+		}
+		else
+		{
+			while (flags.space-- > 0)
+			{
+				ft_putchar(' ');
+				counter++;
+			}
+		}
+	}
+	
+	if (type == 'd')
+	{
+		if (flags.length > 0)
+		{
+			if (flags.minus == 0)
+			{
+				while (flags.length > (int)ft_strlen(ft_itoa(i)))
+				{
+					ft_putchar(flags.filler);
+					counter++;
+					flags.length--;
+				}
+				counter += printf("%d", i);
+			}
+			else 
+			{
+				counter += printf("%d", i);
+				fflush(stdout);
+				while (flags.length > (int)ft_strlen(ft_itoa(i)))
+				{
+					ft_putchar(flags.filler);
+					counter++;
+					flags.length--;
+				}
+			}
+		}
+		else
+			counter += printf("%d", i);
+		fflush(stdout);
+	}
+	else if (type == 'c')
+		counter += printf("%c", i);
+	else if (type == 'x')
+		counter += printf("%x", i);
+	else if (type == 'X')
+		counter += printf("%X", i);
+	else if (type == 'o')
+		counter += printf("%o", i);
+	else if (type == 'u')
+		counter += printf("%u", i);
+	fflush(stdout);
+
+	return (counter);	
+}
+
 int print_one(char type, t_flags flags, va_list args)
 {
 	int counter = 0;
-	flags.null = 0; // trash
-	
 
 	if (type == 'd' || type == 'c' || type == 'x' || type == 'X' || type == 'o' || type == 'u')
 	{
 		int i = va_arg(args, int);
-		if (i >= 0)
-		{
-			if (flags.minus)
-			{
-				ft_putchar('-');
-				counter++;
-			}
-			else if (flags.plus)
-			{
-				ft_putchar('+');
-				counter++;
-			}
-			else
-			{
-				while (flags.space-- > 0)
-				{
-					ft_putchar(' ');
-					counter++;
-				}
-			}
-		}
-		if (type == 'd')
-			counter += printf("%d", i);
-		else if (type == 'c')
-			counter += printf("%c", i);
-		else if (type == 'x')
-			counter += printf("%x", i);
-		else if (type == 'X')
-			counter += printf("%X", i);
-		else if (type == 'o')
-			counter += printf("%o", i);
-		else if (type == 'u')
-			counter += printf("%u", i);
-		fflush(stdout);
+		counter += print_number(type, flags, i);		
 	}
 	else if (type == 's')
 	{
@@ -136,7 +175,7 @@ int print_one(char type, t_flags flags, va_list args)
 		printf("%X", i);
 		counter += printf("%%");	
 	}
-	if (flags.width > counter)
+	if (flags.length > counter)
 	{
 		ft_putchar(' ');
 		counter++;
@@ -174,6 +213,5 @@ int	ft_printf(const char *restrict format, ...)
 		}
 		i++;
 	}
-	//printf("%d%d%d", flags.null, flags.minus, flags.plus);
 	return (counter);
 }
