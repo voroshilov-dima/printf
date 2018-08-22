@@ -15,8 +15,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#define MINUS 0x00000001
-
 typedef struct	s_flags {
 	int		space;
 	int		minus;
@@ -160,18 +158,6 @@ int print_one(char type, t_flags flags, va_list args)
 	else if (type == '%')
 	{
 		counter += printf("%%");
-	}
-	else if (type == 'x')
-	{
-		int i = va_arg(args, int);
-		printf("%x", i);
-		counter += printf("%%");	
-	}
-	else if (type == 'x')
-	{
-		int i = va_arg(args, int);
-		printf("%X", i);
-		counter += printf("%%");	
 	}
 	if (flags.length > counter)
 	{
