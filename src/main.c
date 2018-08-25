@@ -39,13 +39,13 @@ typedef struct	s_print {
 	t_argument	arg;
 }				t_print;
 
-static int	ft_length(long long int n)
+static int	ft_length(long long int n, int base)
 {
 	int len;
 
 	len = 0;
 	while (n && ++len)
-		n = n / 10;
+		n = n / base;
 	return (len);
 }
 
@@ -68,13 +68,13 @@ static int	ft_abs(long long int n)
 
 char		*ft_itoa_base(long long int n, int base)
 {
-	int		i;
-	int		len;
-	char	*str;
+	int			i;
+	int			len;
+	char		*str;
+	char		char_base[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-	base = 0;
 	i = 0;
-	len = ft_length(n);
+	len = ft_length(n, base);
 	str = 0;
 	if (n <= 0)
 		len++;
@@ -87,8 +87,8 @@ char		*ft_itoa_base(long long int n, int base)
 			str[0] = '-';
 		while (n && i < len)
 		{
-			str[len - i - 1] = ft_abs(n % 10) + 48;
-			n = n / 10;
+			str[len - i - 1] = char_base[ft_abs(n % base)];
+			n = n / base;
 			i++;
 		}
 	}
@@ -174,8 +174,6 @@ void get_type(int *i, const char *restrict format, t_print *print)
 	exit(1);	
 }
 
-
-
 void parse_format(t_format *fmt)
 {
 	int	i;
@@ -189,10 +187,10 @@ void parse_format(t_format *fmt)
 			fmt->minus = 1;
 		else if (fmt->str[i] == '+' && fmt->type == 'd')
 			fmt->plus = 1;
-		else if (fmt->str[i] == '0' && fmt->minus != 1 && fmt->type != 's') // TO DO: rework
-			fmt->filler = '0';
-		else if (fmt->str[i] >= 49 && fmt->str[i] <= 57)
+		else if (fmt->width == 0 && fmt->str[i] >= 49 && fmt->str[i] <= 57)
 			fmt->width = ft_atoi(fmt->str + i); // TO DO: rework
+		else if (fmt->str[i] == '0' && fmt->width == 0 && fmt->minus != 1 && fmt->type != 's') // TO DO: rework
+			fmt->filler = '0';
 		else if (fmt->str[i] == 'l')
 			fmt->length++;
 		else if (fmt->str[i] == 'h')
@@ -207,7 +205,7 @@ void parse_format(t_format *fmt)
 	}
 }
 
-void parse_signed_number(t_print *print, va_list args)
+void parse_signed_decimal(t_print *print, va_list args)
 {	
 	if (print->fmt.z == 1)
 		print->arg.str = ft_itoa_base(va_arg(args, size_t), 10);
@@ -230,7 +228,7 @@ void parse_signed_number(t_print *print, va_list args)
 		print->arg.sign = -1;
 }
 
-void parse_unsigned_number(t_print *print, va_list args)
+void parse_unsigned_decimal(t_print *print, va_list args)
 {	
 	if (print->fmt.j == 1)
 		print->arg.str = ft_utoa_base(va_arg(args, uintmax_t), 10);
@@ -240,6 +238,34 @@ void parse_unsigned_number(t_print *print, va_list args)
 		print->arg.str = ft_utoa_base(va_arg(args, long unsigned int), 10);
 	else if (print->fmt.length == 2)
 		print->arg.str = ft_utoa_base(va_arg(args, long long unsigned int), 10);
+}
+
+void parse_hex(t_print *print, va_list args)
+{	
+	if (print->fmt.j == 1)
+		print->arg.str = ft_itoa_base(va_arg(args, uintmax_t), 16);
+	else if (print->fmt.length == 0)
+		print->arg.str = ft_itoa_base(va_arg(args, unsigned int), 16);
+	else if (print->fmt.length == 1)
+		print->arg.str = ft_itoa_base(va_arg(args, long unsigned int), 16);
+	else if (print->fmt.length == 2)
+		print->arg.str = ft_itoa_base(va_arg(args, long long unsigned int), 16);
+	else if (print->fmt.length == -1)
+		print->arg.str = ft_itoa_base((short)va_arg(args, int), 16);
+	else if (print->fmt.length == -2)
+		print->arg.str = ft_itoa_base((char)va_arg(args, int), 16);
+}
+
+void parse_octal(t_print *print, va_list args)
+{
+	if (print->fmt.j == 1)
+		print->arg.str = ft_itoa_base(va_arg(args, uintmax_t), 8);
+	else if (print->fmt.length == 0)
+		print->arg.str = ft_itoa_base(va_arg(args, unsigned int), 8);
+	else if (print->fmt.length == 1)
+		print->arg.str = ft_itoa_base(va_arg(args, long unsigned int), 8);
+	else if (print->fmt.length == 2)
+		print->arg.str = ft_itoa_base(va_arg(args, long long unsigned int), 8);
 }
 
 void parse_char(t_print *print, va_list args)
@@ -267,11 +293,14 @@ void parse_string(t_print *print, va_list args)
 
 void parse_argument(t_print *print, va_list args)
 {
-	
 	if (print->fmt.type == 'd')
-		parse_signed_number(print, args);
+		parse_signed_decimal(print, args);
 	else if (print->fmt.type == 'u')
-		parse_unsigned_number(print, args);
+		parse_unsigned_decimal(print, args);
+	else if (print->fmt.type == 'x' || print->fmt.type == 'X')
+		parse_hex(print, args);
+	else if (print->fmt.type == 'o')
+		parse_octal(print, args);
 	else if (print->fmt.type == 'c')
 		parse_char(print, args);
 	else if (print->fmt.type == '%')
@@ -304,7 +333,6 @@ void	apply_width(t_print *print)
 	filler_length = print->fmt.width - initial_length;
 	if (filler_length > 0)
 	{
-
 		new_str = (char *)malloc(sizeof(char) * (initial_length + filler_length + 1));
 		new_str[initial_length + filler_length] = 0;
 		if (print->fmt.minus)
@@ -337,9 +365,6 @@ void	apply_width(t_print *print)
 					new_str[i++] = print->fmt.filler;
 				insert_string(print->arg.str, new_str, i);
 			}
-
-			
-			
 		}
 		print->arg.str = new_str;
 	}
@@ -379,18 +404,51 @@ void	apply_spaces(t_print *print)
 		new_str = (char *)malloc(sizeof(char) * (initial_length + print->fmt.space + 1));
 		while (i < print->fmt.space)
 			new_str[i++] = ' ';
-		new_str[initial_length + print->fmt.space] = 0;
 		insert_string(print->arg.str, new_str, i);
+		new_str[initial_length + print->fmt.space] = 0;
 		print->arg.str = new_str;
 	}
 }
 
+void	apply_hash(t_print *print)
+{
+	int		initial_length;
+	char	*new_str;
+
+	initial_length = ft_strlen(print->arg.str);
+	if (print->fmt.hash == 1 && print->arg.str[0] != '0')
+	{
+		new_str = (char *)malloc(sizeof(char) * (initial_length + 2 + 1));
+		new_str[0] = '0';
+		new_str[1] = 'x';
+		insert_string(print->arg.str, new_str, 2);
+		new_str[initial_length + 2] = 0;
+		print->arg.str = new_str;
+	}
+}
+
+void	apply_case(t_print *print)
+{
+	int i;
+
+	if (print->fmt.type == 'X')
+	{
+		i = 0;
+		while (print->arg.str[i])
+		{
+			print->arg.str[i] = ft_toupper(print->arg.str[i]);
+			i++;
+		}
+	}
+}
 
 void	apply_formats(t_print *print)
 {
 	apply_spaces(print);
 	apply_plus(print);
 	apply_width(print);
+	apply_hash(print);
+	apply_case(print);
 }
 
 int	printing(char *str)
