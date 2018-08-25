@@ -25,6 +25,7 @@ typedef struct	s_format {
 	char	filler;
 	int		width;
 	int		length;
+	int		precision;
 	int		z;
 	int		j;
 }				t_format;
@@ -49,13 +50,13 @@ static int	ft_length(long long int n, int base)
 	return (len);
 }
 
-static int	ft_ulength(unsigned long long int n)
+static int	ft_ulength(unsigned long long int n, int base)
 {
 	int len;
 
 	len = 0;
 	while (n && ++len)
-		n = n / 10;
+		n = n / base;
 	return (len);
 }
 
@@ -100,10 +101,10 @@ char		*ft_utoa_base(long long unsigned int n, int base)
 	int		i;
 	int		len;
 	char	*str;
+	char	char_base[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-	base = 0;
 	i = 0;
-	len = ft_ulength(n);
+	len = ft_ulength(n, base);
 	str = 0;
 	if ((str = (char *)malloc(sizeof(char) * (len + 1))))
 	{
@@ -112,7 +113,7 @@ char		*ft_utoa_base(long long unsigned int n, int base)
 			return (str);
 		while (n && i < len)
 		{
-			str[len - i - 1] = ft_abs(n % 10) + 48;
+			str[len - i - 1] = char_base[ft_abs(n % base)];
 			n = n / 10;
 			i++;
 		}
@@ -130,6 +131,7 @@ void init_structure(t_print *print)
 	print->fmt.filler = ' ';
 	print->fmt.width = 0;
 	print->fmt.length = 0;
+	print->fmt.precision = 0;
 	print->fmt.z = 0;
 	print->fmt.j = 0;
 
@@ -187,10 +189,12 @@ void parse_format(t_format *fmt)
 			fmt->minus = 1;
 		else if (fmt->str[i] == '+' && fmt->type == 'd')
 			fmt->plus = 1;
-		else if (fmt->width == 0 && fmt->str[i] >= 49 && fmt->str[i] <= 57)
+		else if (fmt->width == 0 && fmt->precision == 0 && fmt->str[i] >= 49 && fmt->str[i] <= 57)
 			fmt->width = ft_atoi(fmt->str + i); // TO DO: rework
 		else if (fmt->str[i] == '0' && fmt->width == 0 && fmt->minus != 1 && fmt->type != 's') // TO DO: rework
 			fmt->filler = '0';
+		else if (fmt->str[i] == '.')
+			fmt->precision = ft_atoi(fmt->str + i + 1);
 		else if (fmt->str[i] == 'l')
 			fmt->length++;
 		else if (fmt->str[i] == 'h')
@@ -243,7 +247,7 @@ void parse_unsigned_decimal(t_print *print, va_list args)
 void parse_hex(t_print *print, va_list args)
 {	
 	if (print->fmt.j == 1)
-		print->arg.str = ft_itoa_base(va_arg(args, uintmax_t), 16);
+		print->arg.str = ft_itoa_base(va_arg(args, intmax_t), 16);
 	else if (print->fmt.length == 0)
 		print->arg.str = ft_itoa_base(va_arg(args, unsigned int), 16);
 	else if (print->fmt.length == 1)
@@ -416,7 +420,7 @@ void	apply_hash(t_print *print)
 	char	*new_str;
 
 	initial_length = ft_strlen(print->arg.str);
-	if (print->fmt.hash == 1 && print->arg.str[0] != '0')
+	if ((print->fmt.type == 'x' || print->fmt.type == 'X') && print->fmt.hash == 1 && print->arg.str[0] != '0')
 	{
 		new_str = (char *)malloc(sizeof(char) * (initial_length + 2 + 1));
 		new_str[0] = '0';
@@ -424,6 +428,14 @@ void	apply_hash(t_print *print)
 		insert_string(print->arg.str, new_str, 2);
 		new_str[initial_length + 2] = 0;
 		print->arg.str = new_str;
+	}
+	else if (print->fmt.type == 'o' && print->fmt.hash == 1 && print->arg.str[0] != '0')
+	{
+		new_str = (char *)malloc(sizeof(char) * (initial_length + 1 + 1));
+		new_str[0] = '0';
+		insert_string(print->arg.str, new_str, 1);
+		new_str[initial_length + 1] = 0;
+		print->arg.str = new_str;	
 	}
 }
 
@@ -442,12 +454,33 @@ void	apply_case(t_print *print)
 	}
 }
 
+void	apply_precision(t_print *print)
+{
+	char	*new_str;
+	int		i;
+
+	if (print->fmt.precision != 0)
+	{
+		i = 0;
+		new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
+		while (i < print->fmt.precision)
+		{
+			 new_str[i] = print->arg.str[i];
+			 i++;
+		}
+		new_str[i] = 0;
+		print->arg.str = new_str;
+	}
+}
+
 void	apply_formats(t_print *print)
 {
+	apply_hash(print);
+	if (print->fmt.type == 's')
+		apply_precision(print);
 	apply_spaces(print);
 	apply_plus(print);
 	apply_width(print);
-	apply_hash(print);
 	apply_case(print);
 }
 
