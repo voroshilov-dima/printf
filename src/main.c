@@ -131,7 +131,7 @@ void init_structure(t_print *print)
 	print->fmt.filler = ' ';
 	print->fmt.width = 0;
 	print->fmt.length = 0;
-	print->fmt.precision = 0;
+	print->fmt.precision = -1;
 	print->fmt.z = 0;
 	print->fmt.j = 0;
 
@@ -189,12 +189,15 @@ void parse_format(t_format *fmt)
 			fmt->minus = 1;
 		else if (fmt->str[i] == '+' && fmt->type == 'd')
 			fmt->plus = 1;
-		else if (fmt->width == 0 && fmt->precision == 0 && fmt->str[i] >= 49 && fmt->str[i] <= 57)
-			fmt->width = ft_atoi(fmt->str + i); // TO DO: rework
+		else if (fmt->width == 0 && fmt->precision == -1 && fmt->str[i] >= 49 && fmt->str[i] <= 57)
+			fmt->width = ft_atoi(fmt->str + i);
 		else if (fmt->str[i] == '0' && fmt->width == 0 && fmt->minus != 1 && fmt->type != 's') // TO DO: rework
 			fmt->filler = '0';
 		else if (fmt->str[i] == '.')
+		{
 			fmt->precision = ft_atoi(fmt->str + i + 1);
+			fmt->filler = ' ';
+		}
 		else if (fmt->str[i] == 'l')
 			fmt->length++;
 		else if (fmt->str[i] == 'h')
@@ -460,7 +463,7 @@ void	apply_precision(t_print *print)
 	int		initial_length;
 	int		i;
 
-	if (print->fmt.precision != 0)
+	if (print->fmt.precision != -1)
 	{
 		i = 0;
 		if (print->fmt.type == 's')
@@ -477,6 +480,7 @@ void	apply_precision(t_print *print)
 		else
 		{
 			initial_length = ft_strlen(print->arg.str);
+			//printf("www %d == %d\n", print->fmt.precision, initial_length);
 			if (print->fmt.precision > initial_length)
 			{
 				new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
@@ -484,7 +488,7 @@ void	apply_precision(t_print *print)
 					new_str[i++] = '0';
 				insert_string(print->arg.str, new_str, i);
 				new_str[print->fmt.precision] = 0;
-				print->arg.str = new_str;		
+				print->arg.str = new_str;
 			}
 		}
 	}
