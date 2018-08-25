@@ -457,27 +457,43 @@ void	apply_case(t_print *print)
 void	apply_precision(t_print *print)
 {
 	char	*new_str;
+	int		initial_length;
 	int		i;
 
 	if (print->fmt.precision != 0)
 	{
 		i = 0;
-		new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
-		while (i < print->fmt.precision)
+		if (print->fmt.type == 's')
 		{
-			 new_str[i] = print->arg.str[i];
-			 i++;
+			new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
+			while (i < print->fmt.precision)
+			{
+				 new_str[i] = print->arg.str[i];
+				 i++;
+			}
+			new_str[i] = 0;
+			print->arg.str = new_str;			
 		}
-		new_str[i] = 0;
-		print->arg.str = new_str;
+		else
+		{
+			initial_length = ft_strlen(print->arg.str);
+			if (print->fmt.precision > initial_length)
+			{
+				new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
+				while (i < print->fmt.precision - initial_length)
+					new_str[i++] = '0';
+				insert_string(print->arg.str, new_str, i);
+				new_str[print->fmt.precision] = 0;
+				print->arg.str = new_str;		
+			}
+		}
 	}
 }
 
 void	apply_formats(t_print *print)
 {
 	apply_hash(print);
-	if (print->fmt.type == 's')
-		apply_precision(print);
+	apply_precision(print);
 	apply_spaces(print);
 	apply_plus(print);
 	apply_width(print);
