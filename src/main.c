@@ -33,6 +33,7 @@ typedef struct	s_format {
 typedef struct	s_argument {
 	char	*str;
 	int		sign;
+	int 	len;
 }				t_argument;
 
 typedef struct	s_print {
@@ -247,6 +248,11 @@ void parse_unsigned_decimal(t_print *print, va_list args)
 		print->arg.str = ft_utoa_base(va_arg(args, long long unsigned int), 10);
 }
 
+void parse_unsigned_long(t_print *print, va_list args)
+{	
+	print->arg.str = ft_utoa_base(va_arg(args, unsigned long), 10);
+}
+
 void parse_hex(t_print *print, va_list args)
 {	
 	if (print->fmt.j == 1)
@@ -279,9 +285,9 @@ void parse_char(t_print *print, va_list args)
 {
 	int	number;
 	number = va_arg(args, int);
-	print->arg.str = (char *)malloc(sizeof(char) * 2);
+	print->arg.len = 1;
+	print->arg.str = (char *)malloc(sizeof(char) * print->arg.len);
 	print->arg.str[0] = number;
-	print->arg.str[1] = 0;
 }
 
 void parse_percent(t_print *print)
@@ -304,6 +310,8 @@ void parse_argument(t_print *print, va_list args)
 		parse_signed_decimal(print, args);
 	else if (print->fmt.type == 'u')
 		parse_unsigned_decimal(print, args);
+	else if (print->fmt.type == 'U') // TO DO: govno
+		parse_unsigned_long(print, args);
 	else if (print->fmt.type == 'x' || print->fmt.type == 'X')
 		parse_hex(print, args);
 	else if (print->fmt.type == 'o')
@@ -423,7 +431,7 @@ void	apply_hash(t_print *print)
 	char	*new_str;
 
 	initial_length = ft_strlen(print->arg.str);
-	if ((print->fmt.type == 'x' || print->fmt.type == 'X') && print->fmt.hash == 1 && print->arg.str[0] != '0')
+	if ((print->fmt.type == 'x' || print->fmt.type == 'X') && print->fmt.hash == 1 && ft_atoi(print->arg.str) != 0)
 	{
 		new_str = (char *)malloc(sizeof(char) * (initial_length + 2 + 1));
 		new_str[0] = '0';
@@ -432,14 +440,14 @@ void	apply_hash(t_print *print)
 		new_str[initial_length + 2] = 0;
 		print->arg.str = new_str;
 	}
-	else if (print->fmt.type == 'o' && print->fmt.hash == 1 && print->arg.str[0] != '0')
+	else if (print->fmt.type == 'o' && print->fmt.hash == 1)
 	{
 		new_str = (char *)malloc(sizeof(char) * (initial_length + 1 + 1));
 		new_str[0] = '0';
 		insert_string(print->arg.str, new_str, 1);
 		new_str[initial_length + 1] = 0;
 		print->arg.str = new_str;	
-	}
+	}	
 }
 
 void	apply_case(t_print *print)
@@ -480,7 +488,6 @@ void	apply_precision(t_print *print)
 		else
 		{
 			initial_length = ft_strlen(print->arg.str);
-			//printf("www %d == %d\n", print->fmt.precision, initial_length);
 			if (print->fmt.precision > initial_length)
 			{
 				new_str = (char *)malloc(sizeof(char) * (print->fmt.precision + 1));
@@ -490,14 +497,20 @@ void	apply_precision(t_print *print)
 				new_str[print->fmt.precision] = 0;
 				print->arg.str = new_str;
 			}
+			else if (print->fmt.precision == 0 && ft_atoi(print->arg.str) == 0 && print->fmt.type != '%')
+			{
+				new_str = (char *)malloc(sizeof(char));
+				new_str[0] = 0;
+				print->arg.str = new_str;
+			}
 		}
 	}
 }
 
 void	apply_formats(t_print *print)
 {
-	apply_hash(print);
 	apply_precision(print);
+	apply_hash(print);
 	apply_spaces(print);
 	apply_plus(print);
 	apply_width(print);
@@ -525,6 +538,17 @@ int	process_input(int *i, const char *restrict format, va_list args)
 	parse_format(&(print.fmt));
 	parse_argument(&print, args);
 	apply_formats(&print);
+	if (print.fmt.type == 'c')
+	{
+		int i;
+		i = 0;
+		while (i < print.arg.len)
+		{
+			ft_putchar(print.arg.str[i]);
+			i++;
+		}
+		return (print.arg.len);
+	}
 	return (printing(print.arg.str));
 }
 
