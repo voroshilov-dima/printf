@@ -229,7 +229,7 @@ void parse_signed_decimal(t_print *print, va_list args)
 		print->arg.str = ft_itoa_base((short)va_arg(args, int), 10);
 	else if (print->fmt.length == -2)
 		print->arg.str = ft_itoa_base((char)va_arg(args, int), 10);
-	
+	print->arg.len = ft_strlen(print->arg.str);
 	// важно, будет ли минус в финальной строке,
 	// а не изначальной, пример printf("%   hhd", 128);
 	if (print->arg.str[0] == '-')
@@ -246,11 +246,13 @@ void parse_unsigned_decimal(t_print *print, va_list args)
 		print->arg.str = ft_utoa_base(va_arg(args, long unsigned int), 10);
 	else if (print->fmt.length == 2)
 		print->arg.str = ft_utoa_base(va_arg(args, long long unsigned int), 10);
+	print->arg.len = ft_strlen(print->arg.str);
 }
 
 void parse_unsigned_long(t_print *print, va_list args)
 {	
 	print->arg.str = ft_utoa_base(va_arg(args, unsigned long), 10);
+	print->arg.len = ft_strlen(print->arg.str);
 }
 
 void parse_hex(t_print *print, va_list args)
@@ -267,6 +269,7 @@ void parse_hex(t_print *print, va_list args)
 		print->arg.str = ft_itoa_base((short)va_arg(args, int), 16);
 	else if (print->fmt.length == -2)
 		print->arg.str = ft_itoa_base((char)va_arg(args, int), 16);
+	print->arg.len = ft_strlen(print->arg.str);
 }
 
 void parse_octal(t_print *print, va_list args)
@@ -279,6 +282,7 @@ void parse_octal(t_print *print, va_list args)
 		print->arg.str = ft_itoa_base(va_arg(args, long unsigned int), 8);
 	else if (print->fmt.length == 2)
 		print->arg.str = ft_itoa_base(va_arg(args, long long unsigned int), 8);
+	print->arg.len = ft_strlen(print->arg.str);
 }
 
 void parse_char(t_print *print, va_list args)
@@ -292,16 +296,31 @@ void parse_char(t_print *print, va_list args)
 
 void parse_percent(t_print *print)
 {
-	print->arg.str = (char *)malloc(sizeof(char) * 2);
+	print->arg.str = (char *)malloc(sizeof(char) * 1);
 	print->arg.str[0] = '%';
-	print->arg.str[1] = 0;
+	print->arg.len = 1;
 }
 
 void parse_string(t_print *print, va_list args)
 {
 	char	*str;
 	str = va_arg(args, char *);
-	print->arg.str = str;
+	if (str == NULL)
+	{
+		print->arg.len = 6;
+		print->arg.str = (char *)malloc(sizeof(char) * print->arg.len);
+		print->arg.str[0] = '(';
+		print->arg.str[1] = 'n';
+		print->arg.str[2] = 'u';
+		print->arg.str[3] = 'l';
+		print->arg.str[4] = 'l';
+		print->arg.str[5] = ')';
+	}
+	else
+	{
+		print->arg.str = str;
+		print->arg.len = ft_strlen(print->arg.str);	
+	}
 }
 
 void parse_argument(t_print *print, va_list args)
@@ -338,23 +357,20 @@ void	insert_string(char *src, char *dest, int place)
 
 void	apply_width(t_print *print)
 {
-	int		initial_length;
 	int		filler_length;
 	char	*new_str;
 	int		i;
 
 	i = 0;
-	initial_length = ft_strlen(print->arg.str);
-	filler_length = print->fmt.width - initial_length;
+	filler_length = print->fmt.width - print->arg.len;
 	if (filler_length > 0)
 	{
-		new_str = (char *)malloc(sizeof(char) * (initial_length + filler_length + 1));
-		new_str[initial_length + filler_length] = 0;
+		new_str = (char *)malloc(sizeof(char) * (print->arg.len + filler_length));
 		if (print->fmt.minus)
 		{
 			insert_string(print->arg.str, new_str, i);
-			i += initial_length;
-			while (i < initial_length + filler_length)
+			i += print->arg.len;
+			while (i < print->arg.len + filler_length)
 				new_str[i++] = print->fmt.filler;
 		}
 		else
@@ -381,6 +397,7 @@ void	apply_width(t_print *print)
 				insert_string(print->arg.str, new_str, i);
 			}
 		}
+		print->arg.len += filler_length;
 		print->arg.str = new_str;
 	}
 }
@@ -399,6 +416,7 @@ void	apply_plus(t_print *print)
 		new_str[initial_length + 1] = 0;
 		insert_string(print->arg.str, new_str, 1);
 		print->arg.str = new_str;
+		print->arg.len++;
 	}
 }
 
@@ -422,32 +440,33 @@ void	apply_spaces(t_print *print)
 		insert_string(print->arg.str, new_str, i);
 		new_str[initial_length + print->fmt.space] = 0;
 		print->arg.str = new_str;
+		print->arg.len = ft_strlen(print->arg.str);
 	}
 }
 
 void	apply_hash(t_print *print)
 {
-	int		initial_length;
 	char	*new_str;
 
-	initial_length = ft_strlen(print->arg.str);
 	if ((print->fmt.type == 'x' || print->fmt.type == 'X') && print->fmt.hash == 1 && ft_atoi(print->arg.str) != 0)
 	{
-		new_str = (char *)malloc(sizeof(char) * (initial_length + 2 + 1));
+		new_str = (char *)malloc(sizeof(char) * (print->arg.len + 2 + 1));
 		new_str[0] = '0';
 		new_str[1] = 'x';
 		insert_string(print->arg.str, new_str, 2);
-		new_str[initial_length + 2] = 0;
+		new_str[print->arg.len + 2] = 0;
 		print->arg.str = new_str;
+		print->arg.len += 2;
 	}
 	else if (print->fmt.type == 'o' && print->fmt.hash == 1)
 	{
-		new_str = (char *)malloc(sizeof(char) * (initial_length + 1 + 1));
+		new_str = (char *)malloc(sizeof(char) * (print->arg.len + 1 + 1));
 		new_str[0] = '0';
 		insert_string(print->arg.str, new_str, 1);
-		new_str[initial_length + 1] = 0;
-		print->arg.str = new_str;	
-	}	
+		new_str[print->arg.len + 1] = 0;
+		print->arg.str = new_str;
+		print->arg.len += 1;
+	}
 }
 
 void	apply_case(t_print *print)
@@ -471,7 +490,7 @@ void	apply_precision(t_print *print)
 	int		initial_length;
 	int		i;
 
-	if (print->fmt.precision != -1)
+	if (print->fmt.precision != -1 && print->fmt.type != 'c')
 	{
 		i = 0;
 		if (print->fmt.type == 's')
@@ -504,6 +523,7 @@ void	apply_precision(t_print *print)
 				print->arg.str = new_str;
 			}
 		}
+		print->arg.len = ft_strlen(print->arg.str);
 	}
 }
 
@@ -517,14 +537,17 @@ void	apply_formats(t_print *print)
 	apply_case(print);
 }
 
-int	printing(char *str)
+int	printing(t_print *print)
 {
-	int	i;
+	int i;
 
 	i = 0;
-	while (str[i])
-		ft_putchar(str[i++]);
-	return (i);
+	while (i < print->arg.len)
+	{
+		ft_putchar(print->arg.str[i]);
+		i++;
+	}
+	return (print->arg.len);
 }
 
 int	process_input(int *i, const char *restrict format, va_list args)
@@ -538,18 +561,7 @@ int	process_input(int *i, const char *restrict format, va_list args)
 	parse_format(&(print.fmt));
 	parse_argument(&print, args);
 	apply_formats(&print);
-	if (print.fmt.type == 'c')
-	{
-		int i;
-		i = 0;
-		while (i < print.arg.len)
-		{
-			ft_putchar(print.arg.str[i]);
-			i++;
-		}
-		return (print.arg.len);
-	}
-	return (printing(print.arg.str));
+	return (printing(&print));
 }
 
 int	ft_printf(const char *restrict format, ...)
