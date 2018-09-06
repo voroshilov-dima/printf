@@ -14,7 +14,10 @@ NAME			 = libftprintf.a
 
 CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -pthread
-SRC_FILES		 = main.c
+SRC_FILES		 =	main.c				\
+					parse_format.c		\
+					parse_numbers.c		\
+					support_functions.c	
 				# rtv1.c			\
 
 SRC_DIR			 = src/
