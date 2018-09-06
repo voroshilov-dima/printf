@@ -1,6 +1,6 @@
 #include "ft_printf.h"
 
-void get_type(int *i, const char *restrict format, t_print *print)
+void get_type(int *i, const char *restrict format, t_fmt *fmt)
 {
 	int		j;
 	char	type;
@@ -26,8 +26,8 @@ void get_type(int *i, const char *restrict format, t_print *print)
 			type == 'C' ||
 			type == '%')
 		{
-			print->fmt.str = ft_strsub(format, *i, j);
-			print->fmt.type = type;
+			fmt->str = ft_strsub(format, *i, j);
+			fmt->type = type;
 			*i += j;
 			return ;
 		}
@@ -37,7 +37,7 @@ void get_type(int *i, const char *restrict format, t_print *print)
 	exit(1);	
 }
 
-void parse_format(t_format *fmt)
+void parse_format(t_fmt *fmt)
 {
 	int	i;
 

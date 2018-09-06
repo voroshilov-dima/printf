@@ -16,8 +16,7 @@ CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -pthread
 SRC_FILES		 =	main.c				\
 					parse_format.c		\
-					parse_numbers.c		\
-					support_functions.c	
+					print_non_numbers.c
 				# rtv1.c			\
 
 SRC_DIR			 = src/

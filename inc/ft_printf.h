@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include "libft.h"
 
-typedef struct	s_format {
+typedef struct	s_fmt {
 	char	*str;
 	char	type;
 	int		space;
@@ -31,26 +31,19 @@ typedef struct	s_format {
 	int		precision;
 	int		z;
 	int		j;
-}				t_format;
+}				t_fmt;
 
-typedef struct	s_argument {
-	char	*str;
-	int		sign;
-	int 	len;
-}				t_argument;
+void	get_type(int *i, const char *restrict format, t_fmt *fmt);
+void	parse_format(t_fmt *fmt);
+// void	parse_signed_decimal(t_fmt *fmt, va_list args);
+// void	parse_unsigned_decimal(t_fmt *fmt, va_list args);
+// void	parse_unsigned_long(t_fmt *fmt, va_list args);
+// void	parse_hex(t_fmt *fmt, va_list args);
+// void	parse_octal(t_fmt *fmt, va_list args);
+int		print_percent(t_fmt *fmt);
+int		print_char(t_fmt *fmt, int c);
+int		print_string(t_fmt *fmt, char *str);
 
-typedef struct	s_print {
-	t_format	fmt;
-	t_argument	arg;
-}				t_print;
-
-void	get_type(int *i, const char *restrict format, t_print *print);
-void	parse_format(t_format *fmt);
-void	parse_signed_decimal(t_print *print, va_list args);
-void	parse_unsigned_decimal(t_print *print, va_list args);
-void	parse_unsigned_long(t_print *print, va_list args);
-void	parse_hex(t_print *print, va_list args);
-void	parse_octal(t_print *print, va_list args);
 char	*ft_itoa_base(long long int n, int base);
 char	*ft_utoa_base(long long unsigned int n, int base);
 int		ft_length(long long int n, int base);
