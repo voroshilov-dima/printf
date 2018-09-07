@@ -59,15 +59,3 @@
 // 	print->arg.len = ft_strlen(print->arg.str);
 // }
 
-// void parse_octal(t_print *print, va_list args)
-// {
-// 	if (print->fmt.j == 1)
-// 		print->arg.str = ft_itoa_base(va_arg(args, uintmax_t), 8);
-// 	else if (print->fmt.length == 0)
-// 		print->arg.str = ft_itoa_base(va_arg(args, unsigned int), 8);
-// 	else if (print->fmt.length == 1)
-// 		print->arg.str = ft_itoa_base(va_arg(args, long unsigned int), 8);
-// 	else if (print->fmt.length == 2)
-// 		print->arg.str = ft_itoa_base(va_arg(args, long long unsigned int), 8);
-// 	print->arg.len = ft_strlen(print->arg.str);
-// }

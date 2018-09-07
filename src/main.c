@@ -36,8 +36,7 @@ int print_argument(t_fmt *fmt, va_list args)
 	// 	parse_unsigned_long(print, args);
 	// else if (print->fmt.type == 'x' || print->fmt.type == 'X')
 	// 	parse_hex(print, args);
-	// else if (print->fmt.type == 'o')
-	// 	parse_octal(print, args);
+	
 	
 	if (fmt->type == '%')
 		return (print_percent(fmt));
@@ -45,6 +44,8 @@ int print_argument(t_fmt *fmt, va_list args)
 	 	return (print_char(fmt, va_arg(args, int)));
 	else if (fmt->type == 's')
 		return (print_string(fmt, va_arg(args, char *)));
+	else if (fmt->type == 'o')
+		return (print_octal(fmt, va_arg(args, long long unsigned int)));
 	return (0);
 }
 

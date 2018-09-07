@@ -43,6 +43,7 @@ void	parse_format(t_fmt *fmt);
 int		print_percent(t_fmt *fmt);
 int		print_char(t_fmt *fmt, int c);
 int		print_string(t_fmt *fmt, char *str);
+int		print_octal(t_fmt *fmt, long long unsigned int number);
 
 char	*ft_itoa_base(long long int n, int base);
 char	*ft_utoa_base(long long unsigned int n, int base);
