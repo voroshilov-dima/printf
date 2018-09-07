@@ -31,24 +31,24 @@ typedef struct	s_fmt {
 	int		precision;
 	int		z;
 	int		j;
+	int		null;
+	int		negative;
+	int		printed;
 }				t_fmt;
 
 void	get_type(int *i, const char *restrict format, t_fmt *fmt);
 void	parse_format(t_fmt *fmt);
-// void	parse_signed_decimal(t_fmt *fmt, va_list args);
-// void	parse_unsigned_decimal(t_fmt *fmt, va_list args);
-// void	parse_unsigned_long(t_fmt *fmt, va_list args);
-// void	parse_hex(t_fmt *fmt, va_list args);
-// void	parse_octal(t_fmt *fmt, va_list args);
+
 int		print_percent(t_fmt *fmt);
 int		print_char(t_fmt *fmt, int c);
 int		print_string(t_fmt *fmt, char *str);
-int		print_octal(t_fmt *fmt, long long unsigned int number);
+int		print_signed(t_fmt *fmt, va_list args, int base);
+int		print_unsigned(t_fmt *fmt, va_list args, int base);
 
-char	*ft_itoa_base(long long int n, int base);
-char	*ft_utoa_base(long long unsigned int n, int base);
-int		ft_length(long long int n, int base);
-int		ft_ulength(unsigned long long int n, int base);
-int		ft_abs(long long int n);
+void	apply_postfix(t_fmt *fmt);
+void	ft_write(char c, t_fmt *fmt);
+void	print_buf(char buf[64], t_fmt *fmt, int len);
+
+int		ft_utoa_base(uintmax_t n, int base, char buf[64]);
 
 #endif

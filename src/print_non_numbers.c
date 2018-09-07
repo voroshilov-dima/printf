@@ -1,41 +1,47 @@
 #include "ft_printf.h"
 
-static int ft_printfiller(t_fmt *fmt, int filler_length)
+static void ft_printfiller(t_fmt *fmt, int filler_length)
 {
 	int	i;
 
 	i = 0;
 	while (i < filler_length)
 	{
-		ft_putchar(fmt->filler);
+		ft_write(fmt->filler, fmt);
 		i++;
 	}
-	return (i);
 }
 
 int print_percent(t_fmt *fmt)
 {
-	int i;
+	int		filler_length;
 
-	i = 1;
-	ft_putchar('%');
-	fmt->type = 'p'; // remove
-	return (i);
+	filler_length = fmt->width - 1;
+	if (filler_length && fmt->minus == 0)
+		ft_printfiller(fmt, filler_length);
+	ft_write('%', fmt);
+	if (filler_length && fmt->minus)
+		ft_printfiller(fmt, filler_length);
+	return (fmt->printed);
 }
 
 int print_char(t_fmt *fmt, int c)
 {
-	ft_putchar(c);
-	fmt->type = 'p'; // remove
-	return (1);
+	int		filler_length;
+
+	filler_length = fmt->width - 1;
+	if (filler_length && fmt->minus == 0)
+		ft_printfiller(fmt, filler_length);
+	ft_write(c, fmt);
+	if (filler_length && fmt->minus)
+		ft_printfiller(fmt, filler_length);
+	return (fmt->printed);
 }
 
 int print_string(t_fmt *fmt, char *str)
 {
-	int		counter;
 	int		filler_length;
 
-	counter = 0;
 	if (str == NULL)
 	{
 		ft_putstr("(null)");
@@ -45,14 +51,13 @@ int print_string(t_fmt *fmt, char *str)
 		str = ft_strsub(str, 0, fmt->precision);
 	filler_length = fmt->width - ft_strlen(str);
 	if (filler_length && fmt->minus == 0)
-		counter += ft_printfiller(fmt, filler_length);
+		ft_printfiller(fmt, filler_length);
 	while (*str)
 	{
-		ft_putchar(*str);
-		counter++;
+		ft_write(*str, fmt);
 		str++;
 	}
 	if (filler_length && fmt->minus)
-		counter += ft_printfiller(fmt, filler_length);
-	return (counter);
+		ft_printfiller(fmt, filler_length);
+	return (fmt->printed);
 }

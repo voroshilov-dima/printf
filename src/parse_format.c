@@ -33,7 +33,7 @@ void get_type(int *i, const char *restrict format, t_fmt *fmt)
 		}
 		j++;
 	}
-	printf("Usage: xxxx\n");
+	ft_putstr("Following flags are supported: sSpdDioOuUxXcC\n");
 	exit(1);	
 }
 

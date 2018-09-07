@@ -14,10 +14,12 @@ NAME			 = libftprintf.a
 
 CC 				 = gcc
 CCFLAGS			 = -Wall -Werror -Wextra -pthread
-SRC_FILES		 =	main.c				\
-					parse_format.c		\
-					print_non_numbers.c	\
-					print_numbers.c
+SRC_FILES		 =	main.c						\
+					support_functions.c			\
+					parse_format.c				\
+					print_non_numbers.c			\
+					print_signed_numbers.c		\
+					print_unsigned_numbers.c
 
 SRC_DIR			 = src/
 OBJ_DIR			 = obj/
