@@ -85,6 +85,8 @@ int					print_signed(t_fmt *fmt, va_list args, int base)
 	long long int		number;
 
 	number = apply_signed_cast(fmt, args);
+	if (fmt->minus == 1)
+		fmt->filler = ' ';
 	fmt->null = (number ? 0 : 1);
 	len = ft_utoa_base(number, base, buf);
 	apply_prefix(fmt, len);

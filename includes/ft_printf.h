@@ -43,6 +43,8 @@ void			apply_postfix(t_fmt *fmt);
 void			print_sign(t_fmt *fmt);
 void			apply_hash(t_fmt *fmt);
 int				parsing(int *i, const char *restrict format, t_fmt *fmt, va_list args);
+int				get_precision(const char *restrict f, int i, t_fmt *fmt);
+int				get_width(const char *restrict f, int i, t_fmt *fmt);
 int				print_unsigned(t_fmt *fmt, va_list args, int base);
 int				ft_utoa_base(uintmax_t n, int base, char buf[64]);
 int				print_signed(t_fmt *fmt, va_list args, int base);

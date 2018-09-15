@@ -36,15 +36,12 @@ int		is_flag(const char *restrict f, int i, t_fmt *fmt)
 		fmt->minus = 1;
 	else if (f[i] == '+')
 		fmt->plus = 1;
-	else if (f[i] >= 49 && f[i] <= 57 && fmt->width == 0 && fmt->precision == -1)
-		fmt->width = ft_atoi(f + i);
-	else if (f[i] == '0' && fmt->width == 0 && fmt->minus != 1 && fmt->type != 's')
+	else if (f[i] >= 49 && f[i] <= 57)
+		result = get_width(f, i, fmt);
+	else if (f[i] == '0')
 		fmt->filler = '0';
 	else if (f[i] == '.')
-	{
-		fmt->precision = ft_atoi(f + i + 1);
-		fmt->filler = ' ';
-	}
+		result = get_precision(f, i, fmt);
 	else if (f[i] == 'l')
 		fmt->length++;
 	else if (f[i] == 'h')
@@ -56,16 +53,18 @@ int		is_flag(const char *restrict f, int i, t_fmt *fmt)
 	else if (f[i] == 'j')
 		fmt->j = 1;
 	else
-		i = 0;
+		result = 0;
 	return (result);
 }
 
 int		parsing(int *i, const char *restrict format, t_fmt *fmt, va_list args)
 {
 	int		j;
+	int 	temp;
 	char	c;
 
 	j = 1;
+	temp = 0;
 	while (format[*i + j])
 	{
 		c = format[*i + j];
@@ -74,12 +73,17 @@ int		parsing(int *i, const char *restrict format, t_fmt *fmt, va_list args)
 			*i += j;
 			return (print_argument(fmt, args));
 		}
-		else if (is_flag(format, *i + j, fmt))
-			j++;
 		else
 		{
-			print_char(fmt, c);
-			return (0);
+			temp = is_flag(format, *i + j, fmt);
+			if (temp)
+				j += temp;
+			else
+			{
+				*i += j;
+				print_char(fmt, c);
+				return (1);	
+			}	
 		}
 	}
 	return (0);

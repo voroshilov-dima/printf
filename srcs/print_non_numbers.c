@@ -19,7 +19,7 @@ static void	ft_printfiller(t_fmt *fmt, int filler_length)
 	i = 0;
 	while (i < filler_length)
 	{
-		ft_write(fmt->filler, fmt);
+		ft_write(' ', fmt);
 		i++;
 	}
 }

@@ -53,9 +53,7 @@ int		ft_printf(const char *restrict format, ...)
 	while (format[i] != '\0')
 	{
 		if (format[i] == '%')
-		{
 			counter += process_input(&i, format, args);
-		}
 		else
 		{
 			ft_putchar(format[i]);
@@ -63,5 +61,6 @@ int		ft_printf(const char *restrict format, ...)
 		}
 		i++;
 	}
+	
 	return (counter);
 }

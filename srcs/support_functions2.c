@@ -47,3 +47,32 @@ void	init_structure(t_fmt *fmt)
 	fmt->negative = 0;
 	fmt->printed = 0;
 }
+
+
+int		get_width(const char *restrict f, int i, t_fmt *fmt)
+{
+	int	j;
+
+	j = 0;
+	while (f[i + j] >= 48 && f[i + j] <= 57)
+	{
+		fmt->width = fmt->width * 10 + f[i + j] - 48;
+		j++;
+	}
+	return (j);
+}
+
+int		get_precision(const char *restrict f, int i, t_fmt *fmt)
+{
+	int	j;
+
+	j = 1;
+	fmt->precision = 0;
+	while (f[i + j] >= 48 && f[i + j] <= 57)
+	{
+		fmt->precision = fmt->precision * 10 + f[i + j] - 48;
+		j++;
+	}
+	fmt->filler = ' ';
+	return (j);
+}

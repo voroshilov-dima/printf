@@ -100,6 +100,8 @@ int					print_unsigned(t_fmt *fmt, va_list args, int base)
 	else if (fmt->type == 'U')
 		fmt->length = 1;
 	number = apply_unsigned_cast(fmt, args);
+	if (fmt->minus == 1)
+		fmt->filler = ' ';
 	fmt->null = (number ? 0 : 1);
 	len = ft_utoa_base(number, base, buf);
 	apply_prefix(fmt, len);
