@@ -39,10 +39,7 @@ static void			apply_prefix(t_fmt *fmt, int len)
 	i = 0;
 	filler_length = calculate_filler_length(fmt, len);
 	if (fmt->filler == '0')
-	{
 		apply_hash(fmt);
-		print_sign(fmt);
-	}
 	if (fmt->minus == 0)
 		while (i < filler_length)
 		{
@@ -50,10 +47,7 @@ static void			apply_prefix(t_fmt *fmt, int len)
 			i++;
 		}
 	if (fmt->filler == ' ')
-	{
-		print_sign(fmt);
 		apply_hash(fmt);
-	}
 }
 
 void				apply_case(char buf[64], t_fmt *fmt, int len)

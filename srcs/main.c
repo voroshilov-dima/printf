@@ -24,9 +24,7 @@ int		print_argument(t_fmt *fmt, va_list args)
 		return (print_unsigned(fmt, args, 8));
 	else if (fmt->type == 'd')
 		return (print_signed(fmt, args, 10));
-	else if (fmt->type == 'u')
-		return (print_unsigned(fmt, args, 10));
-	else if (fmt->type == 'U')
+	else if (fmt->type == 'u' || fmt->type == 'U')
 		return (print_unsigned(fmt, args, 10));
 	else if (fmt->type == 'x' || fmt->type == 'X' || fmt->type == 'p')
 		return (print_unsigned(fmt, args, 16));
@@ -40,10 +38,7 @@ int		process_input(int *i, const char *restrict format, va_list args)
 
 	counter = 0;
 	init_structure(&fmt);
-	if (!get_type(i, format, &fmt))
-		return (0);
-	parse_format(&fmt);
-	return (print_argument(&fmt, args));
+	return (parsing(i, format, &fmt, args));
 }
 
 int		ft_printf(const char *restrict format, ...)
