@@ -31,7 +31,7 @@ void	apply_hash(t_fmt *fmt)
 	}
 }
 
-void	init_structure(t_fmt *fmt)
+void	clear_structure(t_fmt *fmt)
 {
 	fmt->type = 0;
 	fmt->space = 0;
@@ -43,36 +43,35 @@ void	init_structure(t_fmt *fmt)
 	fmt->length = 0;
 	fmt->precision = -1;
 	fmt->z = 0;
+	fmt->j = 0;
 	fmt->null = 0;
 	fmt->negative = 0;
-	fmt->printed = 0;
 }
 
-
-int		get_width(const char *restrict f, int i, t_fmt *fmt)
+int	get_width(const char *restrict f, t_fmt *fmt)
 {
-	int	j;
+	int	i;
 
-	j = 0;
-	while (f[i + j] >= 48 && f[i + j] <= 57)
+	i = 0;
+	while (f[fmt->pointer + i] >= 48 && f[fmt->pointer + i] <= 57)
 	{
-		fmt->width = fmt->width * 10 + f[i + j] - 48;
-		j++;
+		fmt->width = fmt->width * 10 + f[fmt->pointer + i] - 48;
+		i++;
 	}
-	return (j);
+	return (i);	
 }
 
-int		get_precision(const char *restrict f, int i, t_fmt *fmt)
+int	get_precision(const char *restrict f, t_fmt *fmt)
 {
-	int	j;
+	int	i;
 
-	j = 1;
+	i = 1;
 	fmt->precision = 0;
-	while (f[i + j] >= 48 && f[i + j] <= 57)
+	while (f[fmt->pointer + i] >= 48 && f[fmt->pointer + i] <= 57)
 	{
-		fmt->precision = fmt->precision * 10 + f[i + j] - 48;
-		j++;
+		fmt->precision = fmt->precision * 10 + f[fmt->pointer + i] - 48;
+		i++;
 	}
 	fmt->filler = ' ';
-	return (j);
+	return (i);
 }

@@ -59,7 +59,7 @@ void	apply_postfix(t_fmt *fmt)
 	{
 		while (i < filler_length)
 		{
-			ft_write(fmt->filler, fmt);
+			ft_write(' ', fmt);
 			i++;
 		}
 	}

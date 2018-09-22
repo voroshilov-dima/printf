@@ -78,7 +78,7 @@ long long unsigned	apply_signed_cast(t_fmt *fmt, va_list args)
 	return (number);
 }
 
-int					print_signed(t_fmt *fmt, va_list args, int base)
+void				print_signed(t_fmt *fmt, va_list args, int base)
 {
 	int					len;
 	char				buf[64];
@@ -92,5 +92,4 @@ int					print_signed(t_fmt *fmt, va_list args, int base)
 	apply_prefix(fmt, len);
 	print_buf(buf, fmt, len);
 	apply_postfix(fmt);
-	return (fmt->printed);
 }

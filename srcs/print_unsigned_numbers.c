@@ -86,7 +86,7 @@ long long unsigned	apply_unsigned_cast(t_fmt *fmt, va_list args)
 	return (number);
 }
 
-int					print_unsigned(t_fmt *fmt, va_list args, int base)
+void				print_unsigned(t_fmt *fmt, va_list args, int base)
 {
 	int					len;
 	char				buf[64];
@@ -108,5 +108,4 @@ int					print_unsigned(t_fmt *fmt, va_list args, int base)
 	apply_case(buf, fmt, len);
 	print_buf(buf, fmt, len);
 	apply_postfix(fmt);
-	return (fmt->printed);
 }

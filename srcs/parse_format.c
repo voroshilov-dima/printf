@@ -25,66 +25,58 @@ int		is_specifier(char c, t_fmt *fmt)
 	return (0);
 }
 
-int		is_flag(const char *restrict f, int i, t_fmt *fmt)
+int		is_flag(const char *restrict f, t_fmt *fmt)
 {
-	int	result;
+	int	length;
 
-	result = 1;
-	if (f[i] == ' ')
+	length = 1;
+	if (f[fmt->pointer] == ' ')
 		fmt->space += 1;
-	else if (f[i] == '-')
+	else if (f[fmt->pointer] == '-')
 		fmt->minus = 1;
-	else if (f[i] == '+')
+	else if (f[fmt->pointer] == '+')
 		fmt->plus = 1;
-	else if (f[i] >= 49 && f[i] <= 57)
-		result = get_width(f, i, fmt);
-	else if (f[i] == '0')
+	else if (f[fmt->pointer] == '.')
+		length = get_precision(f, fmt);
+	else if (f[fmt->pointer] >= 49 && f[fmt->pointer] <= 57)
+		length = get_width(f, fmt);
+	else if (f[fmt->pointer] == '0')
 		fmt->filler = '0';
-	else if (f[i] == '.')
-		result = get_precision(f, i, fmt);
-	else if (f[i] == 'l')
+	else if (f[fmt->pointer] == 'l')
 		fmt->length++;
-	else if (f[i] == 'h')
+	else if (f[fmt->pointer] == 'h')
 		fmt->length--;
-	else if (f[i] == '#')
+	else if (f[fmt->pointer] == '#')
 		fmt->hash = 1;
-	else if (f[i] == 'z')
+	else if (f[fmt->pointer] == 'z')
 		fmt->z = 1;
-	else if (f[i] == 'j')
+	else if (f[fmt->pointer] == 'j')
 		fmt->j = 1;
 	else
-		result = 0;
-	return (result);
+		length = 0;
+	return (length);
 }
 
-int		parsing(int *i, const char *restrict format, t_fmt *fmt, va_list args)
+void	parsing(const char *restrict format, t_fmt *fmt, va_list args)
 {
-	int		j;
-	int 	temp;
-	char	c;
-
-	j = 1;
-	temp = 0;
-	while (format[*i + j])
+	int	flag_length;
+	clear_structure(fmt);
+	while (format[fmt->pointer])
 	{
-		c = format[*i + j];
-		if (is_specifier(c, fmt))
+		flag_length = is_flag(format, fmt);
+		if (flag_length)
+			fmt->pointer += flag_length;
+		else if (is_specifier(format[fmt->pointer], fmt))
 		{
-			*i += j;
-			return (print_argument(fmt, args));
+			print_argument(fmt, args);
+			fmt->pointer++;
+			return ;
 		}
 		else
 		{
-			temp = is_flag(format, *i + j, fmt);
-			if (temp)
-				j += temp;
-			else
-			{
-				*i += j;
-				print_char(fmt, c);
-				return (1);	
-			}	
+			ft_write(format[fmt->pointer], fmt);
+			fmt->pointer++;
+			return ;
 		}
 	}
-	return (0);
 }

@@ -19,7 +19,6 @@
 # include "libft.h"
 
 typedef struct	s_fmt {
-	char	*str;
 	char	type;
 	int		space;
 	int		minus;
@@ -34,23 +33,25 @@ typedef struct	s_fmt {
 	int		null;
 	int		negative;
 	int		printed;
+	int		pointer;
 }				t_fmt;
 
+
+void			parsing(const char *restrict format, t_fmt *fmt, va_list args);
+void			print_unsigned(t_fmt *fmt, va_list args, int base);
+void			print_signed(t_fmt *fmt, va_list args, int base);
 void			print_buf(char buf[64], t_fmt *fmt, int len);
+void			print_argument(t_fmt *fmt, va_list args);
+void			print_string(t_fmt *fmt, char *str);
+void			print_char(t_fmt *fmt, int c);
 void			ft_write(char c, t_fmt *fmt);
-void			init_structure(t_fmt *fmt);
+void			clear_structure(t_fmt *fmt);
 void			apply_postfix(t_fmt *fmt);
+void			print_percent(t_fmt *fmt);
 void			print_sign(t_fmt *fmt);
 void			apply_hash(t_fmt *fmt);
-int				parsing(int *i, const char *restrict format, t_fmt *fmt, va_list args);
-int				get_precision(const char *restrict f, int i, t_fmt *fmt);
-int				get_width(const char *restrict f, int i, t_fmt *fmt);
-int				print_unsigned(t_fmt *fmt, va_list args, int base);
 int				ft_utoa_base(uintmax_t n, int base, char buf[64]);
-int				print_signed(t_fmt *fmt, va_list args, int base);
-int				print_argument(t_fmt *fmt, va_list args);
-int				print_string(t_fmt *fmt, char *str);
-int				print_char(t_fmt *fmt, int c);
-int				print_percent(t_fmt *fmt);
+int				get_precision(const char *restrict f, t_fmt *fmt);
+int				get_width(const char *restrict f, t_fmt *fmt);
 
 #endif
