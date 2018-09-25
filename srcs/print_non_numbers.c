@@ -12,25 +12,13 @@
 
 #include "ft_printf.h"
 
-static void	apply_prefix(t_fmt *fmt, int filler_length)
-{
-	int	i;
-
-	i = 0;
-	while (i < filler_length)
-	{
-		ft_write(fmt->filler, fmt);
-		i++;
-	}
-}
-
 void		print_percent(t_fmt *fmt)
 {
 	int		filler_length;
 
 	filler_length = fmt->width - 1;
 	if (filler_length && fmt->minus == 0)
-		apply_prefix(fmt, filler_length);
+		print_filler(fmt, filler_length);
 	ft_write('%', fmt);
 	if (filler_length && fmt->minus)
 		apply_postfix(fmt);
@@ -42,7 +30,7 @@ void		print_char(t_fmt *fmt, int c)
 
 	filler_length = fmt->width - 1;
 	if (filler_length && fmt->minus == 0)
-		apply_prefix(fmt, filler_length);
+		print_filler(fmt, filler_length);
 	ft_write(c, fmt);
 	if (filler_length && fmt->minus)
 		apply_postfix(fmt);
@@ -62,7 +50,7 @@ void		print_string(t_fmt *fmt, char *str)
 		str = ft_strsub(str, 0, fmt->precision);
 	filler_length = fmt->width - ft_strlen(str);
 	if (filler_length && fmt->minus == 0)
-		apply_prefix(fmt, filler_length);
+		print_filler(fmt, filler_length);
 	while (*str)
 	{
 		ft_write(*str, fmt);

@@ -16,13 +16,13 @@ static int			calculate_filler_length(t_fmt *fmt, int len)
 {
 	int i;
 
-	i = fmt->width - len;
+	i = fmt->width - (fmt->precision > len ? fmt->precision : len);
+	if (fmt->null == 1 && fmt->precision == 0)
+		i++;
 	if (fmt->negative == 1)
 		i -= 1;
 	else if (fmt->negative == 0 && fmt->plus == 1)
 		i -= 1;
-	if (fmt->precision != -1)
-		i -= (fmt->precision - len);
 	return (i);
 }
 

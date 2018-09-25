@@ -15,6 +15,7 @@
 void	ft_write(char c, t_fmt *fmt)
 {
 	ft_putchar(c);
+	fmt->printed_current++;
 	fmt->printed++;
 }
 
@@ -54,7 +55,7 @@ void	apply_postfix(t_fmt *fmt)
 	int filler_length;
 
 	i = 0;
-	filler_length = fmt->width - fmt->printed;
+	filler_length = fmt->width - fmt->printed_current;
 	if (fmt->minus)
 	{
 		while (i < filler_length)

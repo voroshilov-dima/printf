@@ -12,6 +12,24 @@
 
 #include "ft_printf.h"
 
+void	set_filler(t_fmt *fmt)
+{
+	if (fmt->precision == -1)
+		fmt->filler = '0';
+}
+
+void	print_filler(t_fmt *fmt, int filler_length)
+{
+	int	i;
+
+	i = 0;
+	while (i < filler_length)
+	{
+		ft_write(fmt->filler, fmt);
+		i++;
+	}
+}
+
 void	apply_hash(t_fmt *fmt)
 {
 	if (fmt->hash == 1)
@@ -46,6 +64,7 @@ void	clear_structure(t_fmt *fmt)
 	fmt->j = 0;
 	fmt->null = 0;
 	fmt->negative = 0;
+	fmt->printed_current = 0;
 }
 
 int	get_width(const char *restrict f, t_fmt *fmt)

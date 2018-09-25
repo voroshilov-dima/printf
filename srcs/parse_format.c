@@ -41,7 +41,7 @@ int		is_flag(const char *restrict f, t_fmt *fmt)
 	else if (f[fmt->pointer] >= 49 && f[fmt->pointer] <= 57)
 		length = get_width(f, fmt);
 	else if (f[fmt->pointer] == '0')
-		fmt->filler = '0';
+		set_filler(fmt);
 	else if (f[fmt->pointer] == 'l')
 		fmt->length++;
 	else if (f[fmt->pointer] == 'h')
