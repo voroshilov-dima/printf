@@ -1,9 +1,15 @@
+#include <locale.h>
 #include <stdio.h>
+#include <limits.h>
 
 int	ft_printf(const char *restrict format, ...);
 
 int main(void)
 {
-	ft_printf("@moulitest: %5.d %5.0d", 0, 0);
+	setlocale(LC_ALL, "en_US.UTF-8");	
+	ft_printf("%#.3o", 1);
+	printf("\n");
+	printf("%#.3o", 1);
+	printf("\n");
 	return (0);
 }

@@ -25,7 +25,7 @@ int		is_specifier(char c, t_fmt *fmt)
 	return (0);
 }
 
-int		is_flag(const char *restrict f, t_fmt *fmt)
+int		is_flag(const char *restrict f, t_fmt *fmt, va_list args)
 {
 	int	length;
 
@@ -37,9 +37,9 @@ int		is_flag(const char *restrict f, t_fmt *fmt)
 	else if (f[fmt->pointer] == '+')
 		fmt->plus = 1;
 	else if (f[fmt->pointer] == '.')
-		length = get_precision(f, fmt);
-	else if (f[fmt->pointer] >= 49 && f[fmt->pointer] <= 57)
-		length = get_width(f, fmt);
+		length = get_precision(f, fmt, args);
+	else if ((f[fmt->pointer] >= 49 && f[fmt->pointer] <= 57) || f[fmt->pointer] == 42)
+		length = get_width(f, fmt, args);
 	else if (f[fmt->pointer] == '0')
 		set_filler(fmt);
 	else if (f[fmt->pointer] == 'l')
@@ -57,13 +57,25 @@ int		is_flag(const char *restrict f, t_fmt *fmt)
 	return (length);
 }
 
+void	print_unvalid(const char *restrict format, t_fmt *fmt)
+{
+	int	filler_length;
+
+	filler_length = fmt->width - 1;
+	if (filler_length && fmt->minus == 0)
+		print_filler(fmt, filler_length);
+	ft_write(format[fmt->pointer], fmt);
+	if (filler_length && fmt->minus)
+		apply_postfix(fmt);
+}
+
 void	parsing(const char *restrict format, t_fmt *fmt, va_list args)
 {
 	int	flag_length;
 	clear_structure(fmt);
 	while (format[fmt->pointer])
 	{
-		flag_length = is_flag(format, fmt);
+		flag_length = is_flag(format, fmt, args);
 		if (flag_length)
 			fmt->pointer += flag_length;
 		else if (is_specifier(format[fmt->pointer], fmt))
@@ -74,7 +86,7 @@ void	parsing(const char *restrict format, t_fmt *fmt, va_list args)
 		}
 		else
 		{
-			ft_write(format[fmt->pointer], fmt);
+			print_unvalid(format, fmt);
 			fmt->pointer++;
 			return ;
 		}

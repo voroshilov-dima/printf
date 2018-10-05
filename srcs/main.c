@@ -16,13 +16,17 @@ void	print_argument(t_fmt *fmt, va_list args)
 {
 	if (fmt->type == '%')
 		print_percent(fmt);
+	else if (fmt->type == 'C' || (fmt->type == 'c' && fmt->length == 1))
+		print_unicode_char(fmt, va_arg(args, wchar_t));
 	else if (fmt->type == 'c')
 		print_char(fmt, va_arg(args, int));
-	else if (fmt->type == 's')
+	else if (fmt->type == 'S' || (fmt->type == 's' && fmt->length == 1))
+		print_unicode_string(fmt, va_arg(args, wchar_t *));
+	else if (fmt->type == 's' )
 		print_string(fmt, va_arg(args, char *));
-	else if (fmt->type == 'o')
+	else if (fmt->type == 'o' || fmt->type == 'O')
 		print_unsigned(fmt, args, 8);
-	else if (fmt->type == 'd')
+	else if (fmt->type == 'd' || fmt->type == 'D' || fmt->type == 'i')
 		print_signed(fmt, args, 10);
 	else if (fmt->type == 'u' || fmt->type == 'U')
 		print_unsigned(fmt, args, 10);

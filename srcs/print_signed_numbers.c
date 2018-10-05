@@ -84,6 +84,8 @@ void				print_signed(t_fmt *fmt, va_list args, int base)
 	char				buf[64];
 	long long int		number;
 
+	if (fmt->type == 'D')
+		fmt->length = 1;
 	number = apply_signed_cast(fmt, args);
 	if (fmt->minus == 1)
 		fmt->filler = ' ';

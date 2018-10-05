@@ -21,13 +21,15 @@ static int			calculate_filler_length(t_fmt *fmt, int len)
 		i++;
 	if (fmt->hash == 1)
 	{
-		if (fmt->type == 'o')
+		if (fmt->type == 'o' || fmt->type == 'O')
 			i -= 1;
 		else if (fmt->type == 'x' || fmt->type == 'X' || fmt->type == 'p')
 			i -= 2;
-		if (fmt->precision != -1)
-			i -= (fmt->precision - len);
-	}
+	}	
+	if (fmt->precision != -1 && (fmt->precision - len > 0))
+		i -= fmt->precision - len;
+	if (i < 0)
+		i = 0;
 	return (i);
 }
 
@@ -97,7 +99,7 @@ void				print_unsigned(t_fmt *fmt, va_list args, int base)
 		fmt->hash = 1;
 		fmt->length = 1;
 	}
-	else if (fmt->type == 'U')
+	else if (fmt->type == 'U' || fmt->type == 'O')
 		fmt->length = 1;
 	number = apply_unsigned_cast(fmt, args);
 	if (fmt->minus == 1)
