@@ -17,9 +17,11 @@ CCFLAGS			 = -Wall -Werror -Wextra -pthread
 SRC_FILES		 =	main.c						\
 					support_functions1.c		\
 					support_functions2.c		\
+					support_functions3.c		\
 					parse_format.c				\
 					print_non_numbers.c			\
 					print_signed_numbers.c		\
+					print_unicode.c				\
 					print_unsigned_numbers.c
 
 SRC_DIR			 = srcs/

@@ -6,7 +6,7 @@
 /*   By: dvoroshy <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/04 18:48:15 by dvoroshy          #+#    #+#             */
-/*   Updated: 2018/09/15 11:35:42 by dvoroshy         ###   ########.fr       */
+/*   Updated: 2018/10/06 16:38:16 by dvoroshy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,10 @@ typedef struct	s_fmt {
 	int		negative;
 	int		printed;
 	int		printed_current;
-	int		pointer;
+	int		p;
 }				t_fmt;
 
+char			mask_and_shift(wchar_t *c);
 void			parsing(const char *restrict format, t_fmt *fmt, va_list args);
 void			print_unsigned(t_fmt *fmt, va_list args, int base);
 void			print_signed(t_fmt *fmt, va_list args, int base);

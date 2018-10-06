@@ -25,7 +25,7 @@ static int			calculate_filler_length(t_fmt *fmt, int len)
 			i -= 1;
 		else if (fmt->type == 'x' || fmt->type == 'X' || fmt->type == 'p')
 			i -= 2;
-	}	
+	}
 	if (fmt->precision != -1 && (fmt->precision - len > 0))
 		i -= fmt->precision - len;
 	if (i < 0)
@@ -48,7 +48,8 @@ static void			apply_prefix(t_fmt *fmt, int len)
 			ft_write(fmt->filler, fmt);
 			i++;
 		}
-	if (fmt->filler == ' ')
+	if (fmt->filler == ' ' && ((fmt->type == 'o' && len > fmt->precision)
+		|| fmt->type != 'o'))
 		apply_hash(fmt);
 }
 

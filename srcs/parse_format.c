@@ -25,36 +25,33 @@ int		is_specifier(char c, t_fmt *fmt)
 	return (0);
 }
 
-int		is_flag(const char *restrict f, t_fmt *fmt, va_list args)
+int		is_flag(const char *restrict f, t_fmt *fmt, va_list args, int i)
 {
-	int	length;
-
-	length = 1;
-	if (f[fmt->pointer] == ' ')
+	if (f[fmt->p] == ' ')
 		fmt->space += 1;
-	else if (f[fmt->pointer] == '-')
+	else if (f[fmt->p] == '-')
 		fmt->minus = 1;
-	else if (f[fmt->pointer] == '+')
+	else if (f[fmt->p] == '+')
 		fmt->plus = 1;
-	else if (f[fmt->pointer] == '.')
-		length = get_precision(f, fmt, args);
-	else if ((f[fmt->pointer] >= 49 && f[fmt->pointer] <= 57) || f[fmt->pointer] == 42)
-		length = get_width(f, fmt, args);
-	else if (f[fmt->pointer] == '0')
+	else if (f[fmt->p] == '.')
+		i = get_precision(f, fmt, args);
+	else if ((f[fmt->p] >= 49 && f[fmt->p] <= 57) || f[fmt->p] == 42)
+		i = get_width(f, fmt, args);
+	else if (f[fmt->p] == '0')
 		set_filler(fmt);
-	else if (f[fmt->pointer] == 'l')
+	else if (f[fmt->p] == 'l')
 		fmt->length++;
-	else if (f[fmt->pointer] == 'h')
+	else if (f[fmt->p] == 'h')
 		fmt->length--;
-	else if (f[fmt->pointer] == '#')
+	else if (f[fmt->p] == '#')
 		fmt->hash = 1;
-	else if (f[fmt->pointer] == 'z')
+	else if (f[fmt->p] == 'z')
 		fmt->z = 1;
-	else if (f[fmt->pointer] == 'j')
+	else if (f[fmt->p] == 'j')
 		fmt->j = 1;
 	else
-		length = 0;
-	return (length);
+		i = 0;
+	return (i);
 }
 
 void	print_unvalid(const char *restrict format, t_fmt *fmt)
@@ -64,7 +61,7 @@ void	print_unvalid(const char *restrict format, t_fmt *fmt)
 	filler_length = fmt->width - 1;
 	if (filler_length && fmt->minus == 0)
 		print_filler(fmt, filler_length);
-	ft_write(format[fmt->pointer], fmt);
+	ft_write(format[fmt->p], fmt);
 	if (filler_length && fmt->minus)
 		apply_postfix(fmt);
 }
@@ -72,22 +69,25 @@ void	print_unvalid(const char *restrict format, t_fmt *fmt)
 void	parsing(const char *restrict format, t_fmt *fmt, va_list args)
 {
 	int	flag_length;
+	int	i;
+
 	clear_structure(fmt);
-	while (format[fmt->pointer])
+	while (format[fmt->p])
 	{
-		flag_length = is_flag(format, fmt, args);
+		i = 1;
+		flag_length = is_flag(format, fmt, args, i);
 		if (flag_length)
-			fmt->pointer += flag_length;
-		else if (is_specifier(format[fmt->pointer], fmt))
+			fmt->p += flag_length;
+		else if (is_specifier(format[fmt->p], fmt))
 		{
 			print_argument(fmt, args);
-			fmt->pointer++;
+			fmt->p++;
 			return ;
 		}
 		else
 		{
 			print_unvalid(format, fmt);
-			fmt->pointer++;
+			fmt->p++;
 			return ;
 		}
 	}

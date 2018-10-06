@@ -91,6 +91,8 @@ void				print_signed(t_fmt *fmt, va_list args, int base)
 		fmt->filler = ' ';
 	fmt->null = (number ? 0 : 1);
 	len = ft_utoa_base(number, base, buf);
+	if (fmt->precision != -1)
+		fmt->filler = ' ';
 	apply_prefix(fmt, len);
 	print_buf(buf, fmt, len);
 	apply_postfix(fmt);

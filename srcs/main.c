@@ -22,7 +22,7 @@ void	print_argument(t_fmt *fmt, va_list args)
 		print_char(fmt, va_arg(args, int));
 	else if (fmt->type == 'S' || (fmt->type == 's' && fmt->length == 1))
 		print_unicode_string(fmt, va_arg(args, wchar_t *));
-	else if (fmt->type == 's' )
+	else if (fmt->type == 's')
 		print_string(fmt, va_arg(args, char *));
 	else if (fmt->type == 'o' || fmt->type == 'O')
 		print_unsigned(fmt, args, 8);
@@ -39,20 +39,20 @@ int		ft_printf(const char *restrict format, ...)
 	va_list		args;
 	t_fmt		fmt;
 
-	fmt.pointer = 0;
+	fmt.p = 0;
 	fmt.printed = 0;
 	va_start(args, format);
-	while (format[fmt.pointer] != '\0')
+	while (format[fmt.p] != '\0')
 	{
-		if (format[fmt.pointer] == '%')
+		if (format[fmt.p] == '%')
 		{
-			fmt.pointer++;
+			fmt.p++;
 			parsing(format, &fmt, args);
 		}
 		else
 		{
-			ft_write(format[fmt.pointer], &fmt);
-			fmt.pointer++;
+			ft_write(format[fmt.p], &fmt);
+			fmt.p++;
 		}
 	}
 	return (fmt.printed);
