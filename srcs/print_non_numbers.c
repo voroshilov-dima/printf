@@ -90,7 +90,6 @@ int		unicode_char_len(wchar_t c)
 	return (len);
 }
 
-// REWORK: use unicode_char_len
 int		print_unicode_char(t_fmt *fmt, wchar_t c)
 {
 	char 	buf[4];
@@ -131,16 +130,19 @@ int		ft_strlen_unicode(t_fmt *fmt, wchar_t *s)
 {
 	int	len;
 	int i;
+	int temp;
 
 	len = 0;
 	i = 0;
 	while (s[i] != '\0')
 	{
-		len += unicode_char_len(s[i]);
+		temp = unicode_char_len(s[i]);
+		if (fmt->precision == -1 || fmt->precision >= len + temp)
+			len += temp;
+		else
+			break ;
 		i++;
 	}
-	if (fmt->precision != -1 && fmt->precision < len)
-		len = fmt->precision;
 	return (len);
 }
 
@@ -159,7 +161,7 @@ void		print_unicode_string(t_fmt *fmt, wchar_t *str)
 	if (filler_length && fmt->minus == 0)
 		print_filler(fmt, filler_length);
 	i = 0;
-	while (*str && (fmt->precision == -1 || i + unicode_char_len(*str) < fmt->precision))
+	while (*str && (fmt->precision == -1 || i + unicode_char_len(*str) <= fmt->precision))
 	{
 		i += print_unicode_char(fmt, *str);
 		str++;
