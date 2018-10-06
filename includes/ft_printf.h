@@ -43,7 +43,6 @@ void			print_signed(t_fmt *fmt, va_list args, int base);
 void			print_unicode_string(t_fmt *fmt, wchar_t *str);
 void			print_buf(char buf[64], t_fmt *fmt, int len);
 void			print_filler(t_fmt *fmt, int filler_length);
-void			print_unicode_char(t_fmt *fmt, wchar_t c);
 void			print_argument(t_fmt *fmt, va_list args);
 void			print_string(t_fmt *fmt, char *str);
 void			print_char(t_fmt *fmt, int c);
@@ -55,6 +54,7 @@ void			set_filler(t_fmt *fmt);
 void			print_sign(t_fmt *fmt);
 void			apply_hash(t_fmt *fmt);
 int				ft_utoa_base(uintmax_t n, int base, char buf[64]);
+int				print_unicode_char(t_fmt *fmt, wchar_t c);
 int				get_precision(const char *restrict f, t_fmt *fmt, va_list args);
 int				get_width(const char *restrict f, t_fmt *fmt, va_list args);
 
